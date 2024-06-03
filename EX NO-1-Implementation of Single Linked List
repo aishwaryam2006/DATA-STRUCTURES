@@ -1,0 +1,206 @@
+#include <stdio.h>
+#include <stdlib.h>
+struct Node {
+    int data;
+    struct Node* next;
+};
+
+
+void insertAtBeginning(struct Node** head, int data);
+void insertAfter(struct Node* prevNode, int data);
+void insertAtEnd(struct Node** head, int data);
+struct Node* findElement(struct Node* head, int data);
+struct Node* findNext(struct Node* node);
+struct Node* findPrevious(struct Node* head, struct Node* node);
+int isLast(struct Node* node);
+int isEmpty(struct Node* head);
+void deleteAtBeginning(struct Node** head);
+void deleteAfter(struct Node* prevNode);
+void deleteAtEnd(struct Node** head);
+void deleteList(struct Node** head);
+void printList(struct Node* head);
+
+int main() {
+    struct Node* head = NULL;
+
+    insertAtBeginning(&head, 10);
+    insertAtBeginning(&head, 20);
+    insertAtEnd(&head, 30);
+    insertAfter(head, 25);
+
+    printf("List after insertions: ");
+    printList(head);
+
+    struct Node* found = findElement(head, 25);
+    if (found != NULL)
+        printf("Element 25 found.\n");
+    else
+        printf("Element 25 not found.\n");
+
+    struct Node* next = findNext(head);
+    if (next != NULL)
+        printf("Next element after head is %d.\n", next->data);
+
+    struct Node* previous = findPrevious(head, next);
+    if (previous != NULL)
+        printf("Previous element before %d is %d.\n", next->data, previous->data);
+
+    if (isLast(next))
+        printf("%d is the last element.\n", next->data);
+    else
+        printf("%d is not the last element.\n", next->data);
+
+    if (isEmpty(head))
+        printf("List is empty.\n");
+    else
+        printf("List is not empty.\n");
+
+    deleteAtBeginning(&head);
+    printf("List after deleting at beginning: ");
+    printList(head);
+
+    deleteAfter(head);
+    printf("List after deleting after head: ");
+    printList(head);
+
+    deleteAtEnd(&head);
+    printf("List after deleting at end: ");
+    printList(head);
+
+    deleteList(&head);
+    if (isEmpty(head))
+        printf("List is empty after deletion.\n");
+
+    return 0;
+}
+
+void insertAtBeginning(struct Node** head, int data) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->data = data;
+    newNode->next = *head;
+    *head = newNode;
+}
+
+void insertAfter(struct Node* prevNode, int data) {
+    if (prevNode == NULL) {
+        printf("Previous node cannot be NULL.\n");
+        return;
+    }
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->data = data;
+    newNode->next = prevNode->next;
+    prevNode->next = newNode;
+}
+
+void insertAtEnd(struct Node** head, int data) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->data = data;
+    newNode->next = NULL;
+    if (*head == NULL) {
+        *head = newNode;
+        return;
+    }
+    struct Node* temp = *head;
+    while (temp->next != NULL)
+        temp = temp->next;
+    temp->next = newNode;
+}
+
+struct Node* findElement(struct Node* head, int data) {
+    struct Node* temp = head;
+    while (temp != NULL) {
+        if (temp->data == data)
+            return temp;
+        temp = temp->next;
+    }
+    return NULL;
+}
+
+struct Node* findNext(struct Node* node) {
+    if (node == NULL)
+        return NULL;
+    return node->next;
+}
+
+struct Node* findPrevious(struct Node* head, struct Node* node) {
+    struct Node* temp = head;
+    if (head == node)
+        return NULL;
+    while (temp != NULL && temp->next != node)
+        temp = temp->next;
+    return temp;
+}
+
+int isLast(struct Node* node) {
+    return (node != NULL && node->next == NULL);
+}
+
+int isEmpty(struct Node* head) {
+    return (head == NULL);
+}
+
+void deleteAtBeginning(struct Node** head) {
+    if (*head == NULL)
+        return;
+    struct Node* temp = *head;
+    *head = (*head)->next;
+    free(temp);
+}
+
+void deleteAfter(struct Node* prevNode) {
+    if (prevNode == NULL || prevNode->next == NULL)
+        return;
+    struct Node* temp = prevNode->next;
+    prevNode->next = temp->next;
+    free(temp);
+}
+
+void deleteAtEnd(struct Node** head) {
+    if (*head == NULL)
+        return;
+    struct Node* temp = *head;
+    if (temp->next == NULL) {
+        free(temp);
+        *head = NULL;
+        return;
+    }
+    struct Node* prev = NULL;
+    while (temp->next != NULL) {
+        prev = temp;
+        temp = temp->next;
+    }
+    prev->next = NULL;
+    free(temp);
+}
+
+void deleteList(struct Node** head) {
+    struct Node* current = *head;
+    struct Node* next;
+    while (current != NULL) {
+        next = current->next;
+        free(current);
+        current = next;
+    }
+    *head = NULL;
+}
+
+void printList(struct Node* head) {
+    struct Node* temp = head;
+    while (temp != NULL) {
+        printf("%d -> ", temp->data);
+        temp = temp->next;
+    }
+    printf("NULL\n");
+}
+
+OUTPUT-
+List after insertions: 20 -> 10 -> 25 -> 30 -> NULL
+Element 25 found.
+Next element after head is 10.
+Previous element before 10 is 20.
+10 is not the last element.
+List is not empty.
+List after deleting at beginning: 10 -> 25 -> 30 -> NULL
+List after deleting after head: 10 -> 30 -> NULL
+List after deleting at end: 10 -> NULL
+List is empty after deletion.
